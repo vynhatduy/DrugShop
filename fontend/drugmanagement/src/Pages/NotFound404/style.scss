@@ -1,0 +1,32 @@
+@use "sass:map";
+@import "Styles/Pages/_theme.scss";
+
+.notfound404 {
+    width: 100% !important;
+    position: relative;
+
+    .background1 {
+        width: 100%;
+        height: auto;
+        position: absolute;
+        z-index: 1;
+    }
+
+
+    .background4 {
+        position: absolute;
+        z-index: 4;
+        top: 120px;
+        left: 650px;
+    }
+
+    a {
+        z-index: 1;
+        position:absolute;
+        top:650px;
+        left:750px;
+        font-size:30px;
+        font-weight:700;
+        color:map.get($theme-colors,"main");
+    }
+}

@@ -1,0 +1,221 @@
+@use "sass:map";
+@import "Styles/Pages/_theme.scss";
+
+.cartpage {
+
+    .content {
+        height: auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+
+        .top {
+
+            .item {
+                display: flex;
+                justify-content: space-between;
+                justify-items: center;
+                border: 1px solid rgba(0,0,0,0.2);
+                box-shadow: 2px 1px 1px rgba(0,0,0,0.2);
+                margin: 12px;
+                padding: 12px;
+                height: 90px;
+                width: 100%;
+                align-items: center;
+
+                img {
+                    max-height: 80px;
+                    max-width: 80px;
+                }
+
+                .btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+
+                    button, input {
+                        width: 32px;
+                        height: 32px;
+                        text-align: center;
+                        background: #fff;
+                        border: 1px solid rgba(0,0,0,0.2);
+                        border-radius: 5px;
+                        font-size: 16px;
+                    }
+
+                    input {
+                        color: map.get($theme-colors,"main");
+                    }
+                }
+
+                .btn-remove {
+                    padding: 10px 20px;
+                    border: 1px solid rgba(172,172,172,0.5);
+                    background: map.get($theme-colors,"main");
+                    font-size: 16px;
+                    color: #fff;
+                    border-radius: 5px;
+                }
+
+                .btn-remove:hover {
+                    transform: translate(-4px,-4px);
+                    box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.2);
+                    background: #fa605ad4;
+                    color: beige;
+                }
+            }
+        }
+
+        .bottom {
+            padding: 10px;
+            display: flex;
+            justify-content: start;
+            flex-direction: column;
+
+            span {
+                padding: 10px;
+            }
+
+            .btn {
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                flex-direction: row;
+                gap: 5px;
+
+                button {
+                    padding: 10px;
+                    border-radius: 5px;
+                    border: 1px solid rgba(0,0,0,0.2);
+                }
+
+                button:hover {
+                    transform: translate(-4px,-4px);
+                    box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.2);
+                    background: #fa605ad4;
+                    color: beige;
+                }
+            }
+        }
+
+        .form-order {
+            display:none;
+            margin: 0 auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            z-index: 100;
+            background-color: white;
+            box-shadow: 10px 5px 5px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius:15px;
+
+            form {
+                padding: 20px;
+                display: flex;
+                justify-content: space-between;
+                flex-direction: column;
+
+
+                .cancel{
+                    display:flex;
+                    justify-content:end;
+
+                    button{
+                        background:none;
+                        border:none;
+                        font-size:16px;
+                        padding:5px 10px;
+                    }
+                }
+                h1 {
+                    margin-top:40px;
+                    text-align: center;
+                }
+
+                h2 {
+                    margin-top: 20px;
+                }
+
+                label {
+                    margin-top: 20px;
+                }
+
+                input {
+                    padding: 5px 10px;
+                    padding-left: 20px;
+                    border-radius: 10px;
+                    border: 1px solid rgba(0,0,0,0.2);
+                    margin-top: 5px;
+                    font-size: 14px;
+                }
+
+                input:focus {
+                    outline: none;
+                }
+
+                .hoten {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 20px;
+
+                    div {
+                        width: 45%;
+
+                        input {
+                            width: 80%;
+                        }
+                    }
+                }
+
+                select {
+                    padding: 10px;
+                    margin-top: 20px;
+                    border-radius: 10px;
+                    border: 1px solid rgba(0,0,0,0.2);
+                }
+
+                select:focus {
+                    border: 1px solid rgba(0,0,0,0.2);
+                }
+
+                .lblTotalPrice {
+                    margin-top: 40px;
+                    font-size: 20px;
+                    color: map.get($theme-colors,"main");
+                }
+
+                .btn {
+                    margin: 25px auto;
+                    padding: 10px 50px;
+                    border: 1px solid rgba(0,0,0,0.2);
+                    background: rgba(174, 64, 64, 0.5);
+                    color: white;
+                    border-radius: 10px;
+                }
+
+                .btn:hover {
+                    transform: translate(-4px,-4px);
+                    color:red;
+                    background: rgb(64, 174,174,.5);
+                    box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.1);
+                }
+            }
+        }
+    }
+}
+#overlay {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.1);
+    z-index:99;
+    display:none;
+}
