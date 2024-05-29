@@ -8,5 +8,6 @@
         public double TotalPrice { get; set; }
         public string Address { get; set; }
         public string Status { get; set; }
+        public ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }

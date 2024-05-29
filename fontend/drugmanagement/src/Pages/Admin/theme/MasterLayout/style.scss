@@ -1,0 +1,41 @@
+@use "sass:map";
+@import "Styles/Pages/_theme.scss";
+
+.admin{
+    display:grid;
+    grid-template-columns:auto 9fr;
+    height:99vh;
+    overflow:hidden;
+
+    .left{
+        background-color:#333;
+        color:white;
+        padding:10px;
+        overflow:auto;
+    }
+    .right{
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+
+        .top{
+            background:#f1f1f1;
+            padding:20px;
+            flex:0 0 auto;
+            display:none;
+        }
+        .middle{
+            background:#fff;
+            padding:20px;
+            flex:1 1 auto;
+            overflow-y:auto;
+            overflow-x:auto;
+        }
+        .bottom{
+            background:#f1f1f1;
+            padding:20px;
+            flex:0 0 auto;
+            display:none;
+        }
+    }
+}

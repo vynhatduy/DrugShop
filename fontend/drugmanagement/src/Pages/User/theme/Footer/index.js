@@ -65,12 +65,12 @@ const Footer = () => {
                             </li>
                             <li>
                                 <Link to="">
-                                    <AiOutlineFacebook />Đỗ Đăng Hải
+                                    <AiOutlineFacebook />Tô Văn Sinh
                                 </Link>
                             </li>
                             <li>
                                 <Link to="">
-                                    <AiOutlineFacebook />Nguyễn Bảo Linh
+                                    <AiOutlineFacebook />Nguyễn Thị Thùy Linh
                                 </Link>
                             </li>
                         </ul>

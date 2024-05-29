@@ -1,4 +1,5 @@
-﻿using InventoryServices.Models;
+﻿using Azure;
+using InventoryServices.Models;
 using InventoryServices.Service_Layer;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,11 @@ namespace InventoryServices.Controllers
         {
             _inventoryService = inventoryService;
         }
+        [HttpGet]
+        public async Task<ActionResult<List<Inventory>>> GetAll()
+        {
+            return Ok(await _inventoryService.GetAll());
+        }
 
         [HttpGet("{productId}")]
         public async Task<ActionResult<int>> GetProductStock(int productId)
@@ -23,17 +29,25 @@ namespace InventoryServices.Controllers
         }
 
         [HttpPut("{productId}")]
-        public async Task<IActionResult> UpdateProductStock(int productId, int quantity,int sales)
+        public async Task<IActionResult> UpdateProductStock(Inventory item)
         {
-            await _inventoryService.UpdateProductStockAsync(productId, quantity,sales);
-            return NoContent();
+            var respone = await _inventoryService.UpdateProductStockAsync(item);
+            if (respone)
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         [HttpPost]
         public async Task<ActionResult> AddNewInventoryItem(Inventory item)
         {
-            await _inventoryService.AddNewInventoryItemAsync(item);
-            return CreatedAtAction(nameof(GetProductStock), new { productId = item.ProductId }, item);
+            var respone =  await _inventoryService.AddNewInventoryItemAsync(item);
+            if (respone)
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         [HttpDelete("{productId}")]

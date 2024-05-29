@@ -15,6 +15,26 @@ namespace UserServices.Controllers
             _userService = userService;
         }
 
+        [HttpGet]
+        public async Task<ActionResult> GetAll()
+        {
+            var item = await _userService.GetAll();
+            return Ok(item);
+        }
+        [HttpPost("admin/{username}")]
+        public async Task<ActionResult> AdminCreate(AdminCreateModel model)
+        {
+            var result=await _userService.AdminCreate(model);
+            return result ? Ok() : BadRequest();
+        }
+        
+        [HttpPut("admin/{username}")]
+        public async Task<ActionResult> AdminUpdate(AdminUserModel model)
+        {
+            var result=await _userService.AdminUpdate(model);
+            return result ? Ok() : BadRequest();
+        }
+
         [HttpPost("register")]
         public async Task<ActionResult<User>> RegisterUser(UserModel user)
         {
@@ -56,6 +76,16 @@ namespace UserServices.Controllers
                 return NotFound();
 
             return Ok(user);
+        }
+        [HttpDelete("{username}")]
+        public async Task<ActionResult> Delete(string username)
+        {
+            var result = await _userService.DeleteUserAsync(username);
+            if (result)
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
     }
 }

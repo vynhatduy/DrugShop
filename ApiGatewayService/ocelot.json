@@ -28,10 +28,27 @@
         }
       ]
     },
+    {
+      "UpstreamPathTemplate": "/api/Products/admin",
+      "UpstreamHttpMethod": [ "Get", "Options" ],
+      "DownstreamPathTemplate": "/api/Products/admin",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8101
+        }
+      ],
+      "AddHeadersToRequest": {
+        "Admin": {
+          "Value": true
+        }
+      }
+    },
     // Inventory
     {
       "UpstreamPathTemplate": "/api/Inventory",
-      "UpstreamHttpMethod": [ "Post", "Options" ],
+      "UpstreamHttpMethod": [ "Get", "Post", "Options" ],
       "DownstreamPathTemplate": "/api/Inventory",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -54,9 +71,45 @@
       ]
     },
     //User
+
+    {
+      "UpstreamPathTemplate": "/api/User",
+      "UpstreamHttpMethod": [ "Get", "Options" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/User",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8301
+        }
+      ],
+      "AddHeadersToRequest": {
+        "Admin": {
+          "Value": true
+        }
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/User/admin/{username}",
+      "UpstreamHttpMethod": [ "Post", "Put", "Options" ],
+      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/User/admin/{username}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8301
+        }
+      ],
+      "AddHeadersToRequest": {
+        "Admin": {
+          "Value": true
+        }
+      }
+    },
+
     {
       "UpstreamPathTemplate": "/api/User/{username}",
-      "UpstreamHttpMethod": [ "Get", "Options" ],
+      "UpstreamHttpMethod": [ "Get", "Delete", "Options" ],
       "DownstreamPathTemplate": "/api/User/{username}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -147,6 +200,18 @@
       "UpstreamPathTemplate": "/api/Order",
       "UpstreamHttpMethod": [ "Get", "Options" ],
       "DownstreamPathTemplate": "/api/Order",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8501
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/Order/admin",
+      "UpstreamHttpMethod": [ "Get","Put", "Options" ],
+      "DownstreamPathTemplate": "/api/Order/admin",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {

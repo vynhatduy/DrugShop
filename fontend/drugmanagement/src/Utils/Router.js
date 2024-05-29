@@ -12,7 +12,7 @@ export const ROUTER = {
         CART:"/gio-hang"
     },
     ADMIN: {
-        HOME: "/dasboad",
+        DASHBOARD: "/dashboard",
         PROFILE: "/infomation",
         PRODUCT: "/product",
         ORDER: "/order",
@@ -29,7 +29,7 @@ export const ROUTER = {
 export const APIGATEWAY = {
 
     INVENTORY: {
-        GETALL: "https://localhost:8001/api/Inventory'",
+        GETALL: "https://localhost:8001/api/Inventory",
         BYID: "https://localhost:8001//api/Inventory/byId/",
     },
     ORDER: {
@@ -41,6 +41,7 @@ export const APIGATEWAY = {
     },
     PRODUCT: {
         GETALL: "https://localhost:8001/api/Products",
+        GETALLADMIN: "https://localhost:8001/api/Products/admin",
         BYCATEGORYID: "https://localhost:8001/api/Products/",
         BYNAME: "https://localhost:8001/api/Products/byName/",
         BYID: "https://localhost:8001/api/Products/",

@@ -22,32 +22,56 @@ namespace product_services.Repository
             return await _context.Products.FindAsync(id);
         }
 
-        public async Task<Product> AddProductAsync(Product product)
+        public async Task<bool> AddProductAsync(Product product)
         {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-            return product;
+            try
+            {
+                var newItem = new Product
+                {
+                    Name = product.Name,
+                    Description = product.Description,
+                    Img = product.Img,
+                    Price = product.Price,
+                    Type = product.Type
+                };
+                _context.Products.Add(newItem);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception e)
+            {
+                await Console.Out.WriteLineAsync(e.Message);
+                return false;
+            }
         }
 
-        public async Task<Product> UpdateProductAsync(int id, Product product)
+        public async Task<bool> UpdateProductAsync(int id, Product product)
         {
-            var existingProduct = await _context.Products.FindAsync(id);
-            if (existingProduct == null)
-                return null;
+            try
+            {
+                var existingProduct = await _context.Products.FindAsync(id);
+                if (existingProduct == null)
+                    return false;
 
-            existingProduct.Name = product.Name;
-            existingProduct.Description = product.Description;
-            existingProduct.Type = product.Type;
-            existingProduct.Img = product.Img;
-            existingProduct.Price = product.Price;
+                existingProduct.Name = product.Name;
+                existingProduct.Description = product.Description;
+                existingProduct.Type = product.Type;
+                existingProduct.Img = product.Img;
+                existingProduct.Price = product.Price;
 
-            await _context.SaveChangesAsync();
-            return existingProduct;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception e)
+            {
+                await Console.Out.WriteLineAsync(e.Message);
+                return false;
+            }
         }
 
         public async Task<bool> DeleteProductAsync(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products.FirstOrDefaultAsync(x=>x.Id==id);
             if (product == null)
                 return false;
 

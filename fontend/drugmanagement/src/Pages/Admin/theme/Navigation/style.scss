@@ -1,0 +1,110 @@
+﻿@use "sass:map";
+@import "Styles/Pages/_theme.scss";
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    height: 94vh; // Giữ chiều cao của nav
+    width: 200px; // Chiều rộng ban đầu
+    background-color: #333;
+    color: #fff;
+    transition: width 0.3s;
+
+    span {
+        color: white;
+    }
+
+    &.closed {
+        width: 60px; // Chiều rộng khi menu bị ẩn
+
+        .top span, .bottom span, .container span {
+            display: none;
+        }
+
+        .img {
+            img{
+
+            width: 50px;
+            height: 50px;
+            }
+        }
+
+        .container a {
+            justify-content: center; // Icon căn giữa khi menu bị ẩn
+        }
+
+        .top, .bottom {
+            justify-content: center; // Icon căn giữa trong .top và .bottom khi menu bị ẩn
+        }
+    }
+
+    .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #444;
+
+        svg {
+            cursor: pointer;
+        }
+    }
+
+    .img {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+
+        img {
+            background: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+    }
+
+    .container {
+        flex-grow: 1;
+        padding: 0 0;
+        margin-top: 50px;
+
+        a {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; // Căn trái khi menu mở
+            padding: 10px 0;
+            text-decoration: none;
+            color: #fff;
+            border-bottom: 1px solid #444;
+            white-space: nowrap; // Đảm bảo nội dung không bị xuống dòng
+            width: 100%; // Chiều rộng bằng nhau cho các mục
+            box-sizing: border-box;
+
+            &:not(:last-child) {
+                margin-bottom: 5px;
+            }
+
+            svg {
+                margin-right: 20px;
+            }
+
+            &.active {
+                background-color: red;
+                color: yellow;
+            }
+        }
+    }
+
+    .bottom {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border-top: 1px solid #444;
+        cursor:pointer;
+        svg {
+            margin-right: 20px;
+        }
+    }
+}

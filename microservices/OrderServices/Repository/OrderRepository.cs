@@ -13,28 +13,40 @@ namespace OrderServices.Repository
             _dbContext = dbContext;
         }
 
+        public async Task<List<OrderModel>> AdminGetAll()
+        {
+            var ds = await _dbContext.Orders.Include(x => x.OrderDetails).Select(item => new OrderModel
+            {
+                Username = item.Username,
+                OrderDate = item.OrderDate,
+                Status = item.Status,
+                TotalPrice = item.TotalPrice,
+                Address = item.Address,
+                Details = item.OrderDetails.Select(detail => new OrderDetailModel
+                {
+                    ProductId = detail.ProductId,
+                    Name = detail.Name,
+                    Img = detail.Img,
+                    Price = detail.Price,
+                    Quantity = detail.Quantity
+                }).ToList()
+            }).ToListAsync();
+            return ds;
+        }
         public async Task<IEnumerable<Order>> GetAllOrdersAsync(string Username)
         {
-            return await _dbContext.Orders.Where(o => o.Username==Username).ToListAsync();
+            return await _dbContext.Orders.Where(o => o.Username == Username).ToListAsync();
         }
 
-        public async Task<List<OrderDetail>> GetOrderByIdAsync(string Username,int id)
+        public async Task<List<OrderDetail>> GetOrderByIdAsync(string Username, int id)
         {
-            List<OrderDetail> list=new List<OrderDetail>();
-            var itemOrder = await _dbContext.Orders.Where(x => x.Username == Username).ToListAsync();
-            if (itemOrder == null)
+            var order=await _dbContext.Orders.FirstOrDefaultAsync(x=>x.Username==Username&& x.Id==id);
+            if (order == null)
             {
-                return list;
+                return new List<OrderDetail>();
             }
-            foreach (var x in itemOrder)
-            {
-                var item = await _dbContext.OrderDetails.Where(x => x.OrderId == id).ToListAsync();
-                if (item != null)
-                {
-                    list.AddRange(item);
-                }
-            }
-            return list;
+            var orderDetail = await _dbContext.OrderDetails.Where(x => x.OrderId == id).ToListAsync();
+            return orderDetail;
         }
 
         public async Task<bool> CreateOrderAsync(Order order, List<OrderDetail> orderDetails)
@@ -44,16 +56,23 @@ namespace OrderServices.Repository
             {
                 _dbContext.Orders.Add(order);
                 await _dbContext.SaveChangesAsync();
-
-                foreach (var detail in orderDetails)
+                await Console.Out.WriteLineAsync(orderDetails.ToString());
+                var existingOrder = await _dbContext.Orders.FirstOrDefaultAsync(x => x.Id == order.Id);
+                if (existingOrder != null)
                 {
-                    var item = await _dbContext.Orders.FirstOrDefaultAsync(x => x.Username == order.Username && x.OrderDate == order.OrderDate && x.TotalPrice == order.TotalPrice && x.Address == order.Address && x.Status == order.Status);
-                    detail.OrderId = item!.Id;
-                    await _dbContext.OrderDetails.AddAsync(detail);
-                    await Console.Out.WriteLineAsync("Id san pham: "+detail.ProductId);
-                    await _dbContext.SaveChangesAsync();
+                    foreach(var item in orderDetails)
+                    {
+                        item.OrderId = existingOrder.Id;
+                        _dbContext.OrderDetails.Add(item);
+                    }
+                }
+                else
+                {
+                    await transaction.RollbackAsync();
+                    return false;
                 }
 
+                await _dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
                 await Console.Out.WriteLineAsync("Thêm đơn hàng thành công");
                 return true;
@@ -66,7 +85,8 @@ namespace OrderServices.Repository
             }
         }
 
-        public async Task<bool> UpdateOrderStatusAsync(string Username,int orderId, string status)
+
+        public async Task<bool> UpdateOrderStatusAsync(string Username, int orderId, string status)
         {
             try
             {
@@ -79,9 +99,29 @@ namespace OrderServices.Repository
                 }
                 return false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 await Console.Out.WriteLineAsync(e.Message);
+                return false;
+            }
+        }
+        public async Task<bool> AdminUpdate(string username, DateTime orderDate)
+        {
+            try
+            {
+                var item = await _dbContext.Orders.FirstOrDefaultAsync(x => x.Username == username && x.OrderDate == orderDate);
+                await Console.Out.WriteLineAsync(item.ToString());
+                if (item == null)
+                {
+                    return false;
+                }
+                item.Status = "Chờ giao";
+                _dbContext.Orders!.Update(item);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
                 return false;
             }
         }

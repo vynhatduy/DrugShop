@@ -4,6 +4,9 @@
 .login {
     background-image: linear-gradient(to right, rgb(168 199 250), rgb(0 241 255));
     padding: 20px;
+    height:94vh;
+    display:flex;
+    align-content:center;
 
     .loginform {
 
@@ -64,6 +67,7 @@
             span{
                 color:#000;
                 visibility:visible!important;
+                cursor:pointer;
             }
         }
         .btn-login{
@@ -90,6 +94,7 @@
                 visibility:visible!important;
                 color:#000;
                 padding:10px;
+                cursor:pointer;
             }
         }
     }

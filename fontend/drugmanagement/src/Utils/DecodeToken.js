@@ -1,7 +1,6 @@
 ﻿export const DecodeToken = (token) => {
     try {
         const parts = token.split('.');
-        console.log(parts);
         const decodeTokenPayload = JSON.parse(atob(parts[1]));
         return {
             aud: decodeTokenPayload.aud,
@@ -12,7 +11,6 @@
         };
     }
     catch (error) {
-        console.log("Giải mã thất bại :", error);
         return null;
     }
 }

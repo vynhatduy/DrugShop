@@ -5,6 +5,7 @@
     display: flex;
     justify-content: center;
     background-image: linear-gradient(to right, rgb(168, 199, 250), rgb(0, 241, 255));
+    height: 99vh;
 
     input {
         border: none;
@@ -38,40 +39,44 @@
             padding: 5px;
             border-bottom: 1px solid rgba(0,0,0,0.2);
         }
+
         form {
             .widget {
-                div{
-                    margin-top:15px;
+                div {
+                    margin-top: 15px;
                 }
+
                 span {
-                    visibility:hidden;
+                    visibility: hidden;
                     color: map.get($theme-colors,"main");
                 }
             }
         }
     }
-    .btn-regist{
-        display:flex;
-        justify-content:center;
 
-        button{
-            padding:10px 50px;
-            margin:20px 0;
-            border:1px solid rgba(0,0,0,0.2);
-            border-radius:15px;
-            background:map.get($theme-colors,"main");
-            color:#FFF;
-            text-transform:uppercase;
+    .btn-regist {
+        display: flex;
+        justify-content: center;
+
+        button {
+            padding: 10px 50px;
+            margin: 20px 0;
+            border: 1px solid rgba(0,0,0,0.2);
+            border-radius: 15px;
+            background: map.get($theme-colors,"main");
+            color: #FFF;
+            text-transform: uppercase;
         }
     }
-    .btn-login{
-        display:flex;
-        justify-content:center;
-        align-items:center;
 
-        span{
-            padding:10px;
-            cursor:pointer;
+    .btn-login {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        span {
+            padding: 10px;
+            cursor: pointer;
         }
     }
 }

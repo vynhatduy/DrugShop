@@ -12,6 +12,18 @@ namespace UserServices.Services_layer
             _userRepository = userRepository;
         }
 
+        public async Task<List<AdminUserModel>> GetAll()
+        {
+            return await _userRepository.GetAll();
+        }
+        public async Task<bool> AdminCreate(AdminCreateModel model)
+        {
+            return await _userRepository.AdminCreate(model);
+        }
+        public async Task<bool> AdminUpdate(AdminUserModel user)
+        {
+            return await _userRepository.AdminUpdate(user);
+        }
         public async Task<bool> AddUserAsync(UserModel user)
         {
             return await _userRepository.AddUserAsync(user);

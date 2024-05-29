@@ -10,9 +10,11 @@ import { FaShippingFast } from 'react-icons/fa';
 import { MdAddShoppingCart } from 'react-icons/md';
 import './style.scss';
 import { DecodeToken } from '../../../Utils/DecodeToken';
+import LoadingSpinner from '../../../Components/Loadding';
 
 
 const ProductDeltailUser = () => {
+    const [isLoadding, setIsLoadding] = useState(true);
     const [list, setList] = useState([]);
     const [cate, setCate] = useState([]);
     const { productId } = useParams();
@@ -22,25 +24,21 @@ const ProductDeltailUser = () => {
         decodeToken = DecodeToken(token);
     }
     
-    console.log(productId);
     useEffect(() => {
+        if (isLoadding) {
         fetchProduct(productId);
-        fetchCate(productId);
-    }, [productId])
+            fetchCate(productId);
+            setIsLoadding(false);
+        }
+    }, [productId,isLoadding])
     const fetchProduct = (productId) => {
-        let apiUrl = APIGATEWAY.PRODUCT.BYID + productId;
-        console.log(apiUrl);
-
-        axios.get(apiUrl).then(respone => {
-
+        axios.get(APIGATEWAY.PRODUCT.BYID + productId).then(respone => {
             setList(Array(respone.data));
         }
         ).catch(error => console.error('Error fetching products:', error));
     }
     const fetchCate = (productId) => {
-        let apiUrl = APIGATEWAY.INVENTORY.BYID + productId;
-        console.log(apiUrl);
-        axios.get(apiUrl).then(respone => {
+        axios.get(APIGATEWAY.INVENTORY.BYID + productId).then(respone => {
             setCate(Array(respone.data));
         }).catch(error => { console.error('Error fetching products:', error); return <NotFound404 />; });
     }
@@ -72,16 +70,10 @@ const ProductDeltailUser = () => {
         if (lblNumElement) {
             let lbl = parseInt(lblNumElement.value, 10);
             price = parseFloat(lbl * price);
-            console.log("gia " + price);
-            console.log("ten " + name);
-            console.log("so luong " + lbl);
             if (lbl > 0) {
-                console.log("Đã thêm vào giỏ hàng");
 
                 if (token !== null && token !== "null" && token !== "" & token !== undefined &&decodeToken!==null) {
                     const username = decodeToken.username;
-                    console.log(token);
-                    console.log(username);
 
                     const data = {
                         Username: username,
@@ -91,7 +83,6 @@ const ProductDeltailUser = () => {
                         Quantity: lbl,
                         Price: price
                     };
-                    console.log("item " + JSON.stringify(data));
                     axios.post(APIGATEWAY.CART.BYUSERNAME, data)
                         .then(response => {
                             window.alert(response.data);
@@ -120,7 +111,6 @@ const ProductDeltailUser = () => {
                             img: img,
                             price: price
                         };
-                        console.log("item " + JSON.stringify(data));
                         cartData.push(data);
                         window.alert("Đã thêm vào giỏ hàng");
                         window.location.reload();
@@ -142,7 +132,6 @@ const ProductDeltailUser = () => {
         if (lblElement !== null) {
             let lbl = parseInt(lblElement.value, 10);
             if (lbl > 0) {
-                console.log("Bạn chắc chắn muốn mua sản phẩm này chứ ?");
                 const confirmed = window.confirm("Bạn chắc chắn muốn mua sản phẩm này chứ ?");
                 if (confirmed) {
                     window.alert("Đặt hàng thành công");
@@ -161,55 +150,57 @@ const ProductDeltailUser = () => {
 
     return (
         <div className="container">
-            <div className="product-detail">
-                <div className="info">
-                {
-                    list.map((item) => (
-                        <div className="row" key={item.id}>
-                            <div className="col-5">
-                                <div className="img">
-                                    <img src={item.img} alt={item.name} />
-                                </div>
-                            </div>
-
-                            <div className="col-7">
-                                <h1 id="ten">{item.name}</h1>
-                                <span>{item.description}</span>
-                                {
-                                    cate.map((itemData) => (
-                                        <div className="heading" key={itemData.key}>
-                                            <span>Số lượng : {item.quantity}    |    Đã bán : {item.sales}</span>
+            {isLoadding ? <LoadingSpinner /> : <>
+                <div className="product-detail">
+                    <div className="info">
+                        {
+                            list.map((item) => (
+                                <div className="row" key={item.id}>
+                                    <div className="col-5">
+                                        <div className="img">
+                                            <img src={item.img} alt={item.name} />
                                         </div>
-                                    ))
-                                }
-                                <h2 id="gia">{Formater(item.price)}</h2>
-                                <div className="content">
-                                    <span>Vận Chuyển</span>
-                                    <div>
-                                        <p><TbCalendarClock /> Hàng Đặt Trước (có hàng sau 15 ngày)</p>
-                                        <p><FaShippingFast /> Miễn phí vận chuyển</p>
-                                        <p> Vận Chuyển: Toàn quốc</p>
-                                        <p> Phí Vận Chuyển: 0đ</p>
+                                    </div>
+
+                                    <div className="col-7">
+                                        <h1 id="ten">{item.name}</h1>
+                                        <span>{item.description}</span>
+                                        {
+                                            cate.map((itemData) => (
+                                                <div className="heading" key={itemData.key}>
+                                                    <span>Số lượng : {item.quantity}    |    Đã bán : {item.sales}</span>
+                                                </div>
+                                            ))
+                                        }
+                                        <h2 id="gia">{Formater(item.price)}</h2>
+                                        <div className="content">
+                                            <span>Vận Chuyển</span>
+                                            <div>
+                                                <p><TbCalendarClock /> Hàng Đặt Trước (có hàng sau 15 ngày)</p>
+                                                <p><FaShippingFast /> Miễn phí vận chuyển</p>
+                                                <p> Vận Chuyển: Toàn quốc</p>
+                                                <p> Phí Vận Chuyển: 0đ</p>
+                                            </div>
+                                        </div>
+                                        <div className="add-to-cart">
+                                            <span>Số lượng:</span>
+                                            <div className="btn">
+                                                <button id="btn-sub" onClick={handleClickSub}> - </button>
+                                                <div className="input"><input type="number" id="lbl" defaultValue="0" readOnly /></div>
+                                                <button id="btn-add" onClick={handleClickAdd}> + </button>
+                                            </div>
+                                        </div>
+                                        <div className="btn-addtocart">
+                                            <button id="add-to-cart" className="add-cart" onClick={() => addToCart(item.id, item.img, item.name, item.price)} ><MdAddShoppingCart /> Thêm vào giỏ hàng</button>
+                                            <button id="order-now" className="order-now" onClick={orderNow}>Mua Ngay</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="add-to-cart">
-                                    <span>Số lượng:</span>
-                                    <div className="btn">
-                                        <button id="btn-sub" onClick={handleClickSub}> - </button>
-                                        <div className="input"><input type="number" id="lbl" defaultValue="0" readOnly /></div>
-                                        <button id="btn-add" onClick={handleClickAdd}> + </button>
-                                    </div>
-                                </div>
-                                <div className="btn-addtocart">
-                                    <button id="add-to-cart" className="add-cart" onClick={() => addToCart(item.id,item.img, item.name, item.price)} ><MdAddShoppingCart /> Thêm vào giỏ hàng</button>
-                                    <button id="order-now" className="order-now" onClick={orderNow}>Mua Ngay</button>
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                    }
+                            ))
+                        }
+                    </div>
                 </div>
-            </div>
+            </>}
 
         </div>
 

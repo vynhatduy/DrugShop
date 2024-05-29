@@ -13,6 +13,89 @@ namespace UserServices.Repository
             _context = context;
         }
 
+        public async Task<List<AdminUserModel>> GetAll()
+        {
+            try
+            {
+                var ds = new List<AdminUserModel>();
+                var item = await _context.Users.ToListAsync();
+                foreach(var i in item)
+                {
+                    var role = await _context.UserRoles.FirstOrDefaultAsync(x=>x.Username==i.Username);
+                    if (role != null)
+                    {
+                        ds.Add(new AdminUserModel
+                        {
+                            UserId = i.UserId,
+                            Name = i.Name,
+                            Address = i.Address,
+                            PasswordHash = i.PasswordHash,
+                            PasswordSalt = i.PasswordSalt,
+                            Username = i.Username,
+                            RoleId = role.RoleId
+                        });
+                    }
+                }
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return null;
+            }
+        }
+        
+        public async Task<bool> AdminCreate(AdminCreateModel model)
+        {
+            try
+            {
+                var itemUser=await _context.Users.FirstOrDefaultAsync(x=>x.Username== model.Username);
+                var itemUserRole=await _context.UserRoles.FirstOrDefaultAsync(x=>x.Username== model.Username);
+                if(itemUser!=null || itemUserRole!=null) return false;
+                var hash = HasherPassword.HashPass(model.Password.ToString().Trim());
+                _context.Users.Add(new User
+                {
+                    Address=model.Address,
+                    Name=model.Name,
+                    PasswordHash = hash["password"],
+                    PasswordSalt = hash["salt"],
+                    Username=model.Username
+                });
+                _context.UserRoles.Add(new UserRole
+                {
+                    Username=model.Username,
+                    RoleId=model.RoleId
+                });
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                await Console.Out.WriteLineAsync(e.Message);
+                return false;
+            }
+        }
+        public async Task<bool> AdminUpdate(AdminUserModel user)
+        {
+            try
+            {
+                var itemUser=await _context.Users.FirstOrDefaultAsync(x=>x.Username== user.Username);
+                var itemUserRole=await _context.UserRoles.FirstOrDefaultAsync(x=>x.Username== user.Username);
+                if(itemUser==null || itemUserRole==null) return false;
+                itemUser.Address = user.Address;
+                itemUser.Name = user.Name;
+                itemUserRole.RoleId=user.RoleId;
+                _context.Users.Update(itemUser);
+                _context.UserRoles.Update(itemUserRole);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                await Console.Out.WriteLineAsync(e.Message);
+                return false;
+            }
+        }
         public async Task<bool> AddUserAsync(UserModel user)
         {
             try

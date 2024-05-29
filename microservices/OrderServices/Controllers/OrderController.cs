@@ -25,6 +25,26 @@ namespace OrderServices.Controllers
             }
             return Ok(orders);
         }
+        [HttpGet("admin")]
+        public async Task<IActionResult> AdminGetAll()
+        {
+            var order = await _orderService.AdminGetAll();
+            if (order == null)
+            {
+                return NotFound();
+            }
+            return Ok(order);
+        }
+        [HttpPut("admin")]
+        public async Task<IActionResult> AdminUpDate(string username, DateTime orderDate)
+        {
+            var result=await _orderService.AdminUpdate(username, orderDate);
+            if (result)
+            {
+                return Ok(new { message = "Đã cập nhật đơn hàng" });
+            }
+            return BadRequest();
+        }
 
         [HttpGet("getDataUser/{Username}/{id}")]
         public async Task<IActionResult> GetOrderById(string Username,int id)

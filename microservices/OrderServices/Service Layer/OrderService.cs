@@ -12,6 +12,11 @@ namespace OrderServices.Service_Layer
             _orderRepository = orderRepository;
         }
 
+        public async Task<List<OrderModel>> AdminGetAll()
+        {
+            var orders = await _orderRepository.AdminGetAll();
+            return orders;
+        }
         public async Task<IEnumerable<Order>> GetAllOrdersAsync(string Username)
         {
             var orders = await _orderRepository.GetAllOrdersAsync(Username);
@@ -68,6 +73,15 @@ namespace OrderServices.Service_Layer
         public async Task<bool> UpdateOrderStatusAsync(string Username,int orderId, string status)
         {
             var result= await _orderRepository.UpdateOrderStatusAsync(Username,orderId, status);
+            if (result)
+            {
+                return true;
+            }
+            return false;
+        }
+        public async Task<bool> AdminUpdate(string username, DateTime orderDate)
+        {
+            var result =await _orderRepository.AdminUpdate(username, orderDate);
             if (result)
             {
                 return true;

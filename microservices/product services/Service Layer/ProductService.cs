@@ -22,12 +22,12 @@ namespace product_services.Service_Layer
             return await _productRepository.GetProductByIdAsync(id);
         }
 
-        public async Task<Product> AddProductAsync(Product product)
+        public async Task<bool> AddProductAsync(Product product)
         {
             return await _productRepository.AddProductAsync(product);
         }
 
-        public async Task<Product> UpdateProductAsync(int id, Product product)
+        public async Task<bool> UpdateProductAsync(int id, Product product)
         {
             return await _productRepository.UpdateProductAsync(id, product);
         }

@@ -8,12 +8,14 @@ import { APIGATEWAY, ROUTER } from '../../../Utils/Router';
 import { Formater } from '../../../Utils/formater';
 import NotFound404 from '../../NotFound404';
 import { Form } from 'react-router-dom';
+import LoadingSpinner from '../../../Components/Loadding';
 
 const CartUser = () => {
     const [paymentMethod, setPaymentMethod] = useState("");
     const token = localStorage.getItem('token');
     const [listCart, setListCart] = useState([]);
     const [order, setOrder] = useState({});
+    const [isLoadding, setIsLoadding] = useState(true);
     let cartData = JSON.parse(localStorage.getItem('cartData'));
     let totalPrice = 0;
     const details = [];
@@ -23,28 +25,32 @@ const CartUser = () => {
     }
 
     useEffect(() => {
-        if (decodedToken !== null&&decodedToken!=="null") {
-            axios.get(APIGATEWAY.CART.GETBYUSERNAME + decodedToken.username)
-                .then(response => {
-                    setListCart(response.data);
-                })
-                .catch(error => { console.log("Lỗi ", error); return <NotFound404 /> });
-        }
-        else {
-
-            if (cartData !== null && cartData.length !== 0) {
-                setListCart(cartData);
+        if (isLoadding) {
+            if (decodedToken !== null && decodedToken !== "null") {
+                axios.get(APIGATEWAY.CART.GETBYUSERNAME + decodedToken.username)
+                    .then(response => {
+                        setListCart(response.data);
+                    })
+                    .catch(error => { console.log("Lỗi ", error); return <NotFound404 /> }).finally(e => {
+                        setIsLoadding(false);
+                    });
             }
-            if (cartData === null || cartData.length !== 0) {
-                return <NotFound404 />
+            else {
+
+                if (cartData !== null && cartData.length !== 0) {
+                    setListCart(cartData);
+                }
+                if (cartData === null || cartData.length !== 0) {
+                    return <NotFound404 />
+                }
+            }
+
+            const lblpriceElement = document.getElementById('lblTotalPrice');
+            if (lblpriceElement !== null) {
+                lblpriceElement.textContent = Formater(totalPrice);
             }
         }
-
-        const lblpriceElement = document.getElementById('lblTotalPrice');
-        if (lblpriceElement !== null) {
-            lblpriceElement.textContent = Formater(totalPrice);
-        }
-    }, [token]);
+    }, [token,isLoadding]);
 
     const Sub = (item) => {
         const lblElement = document.getElementById(`lbl-num${item.productId}`);
@@ -70,7 +76,7 @@ const CartUser = () => {
             item.quantity = num;
             item.price = price;
 
-
+            setIsLoadding(true);
             updateDataCart(item);
         }
 
@@ -99,71 +105,79 @@ const CartUser = () => {
             item.quantity = num;
             item.price = price;
 
-
+            setIsLoadding(true);
             updateDataCart(item);
         }
 
 
     };
 
+
     const updateDataCart = (item) => {
-        if (decodedToken !== null&&decodedToken!=="null") {
-            const data = {
-                Username: item.username,
-                ProductId: item.productId,
-                Name: item.name,
-                Img: item.img,
-                Quantity: item.quantity,
-                Price: item.price
-            };
-            console.log("item " + JSON.stringify(data));
-            axios.post(APIGATEWAY.CART.BYUSERNAME, data)
-                .then(response => {
-                    window.alert(response.data);
-                    window.alert("Cập nhật giỏ hàng thành công");
-                    window.location.reload();
+        setIsLoadding(true);
+            if (decodedToken !== null && decodedToken !== "null") {
+                const data = {
+                    Username: item.username,
+                    ProductId: item.productId,
+                    Name: item.name,
+                    Img: item.img,
+                    Quantity: item.quantity,
+                    Price: item.price
+                };
+                axios.post(APIGATEWAY.CART.BYUSERNAME, data)
+                    .then(response => {
+                        window.alert("Cập nhật giỏ hàng thành công");
+                        window.location.reload();
+                    })
+                    .catch(error => console.error('Error adding to cart:', error))
+                    .finally(() => {
+                        setIsLoadding(false);
+                    });
+            }
+            else {
+                const index = cartData.findIndex(dataItem => dataItem.productId === item.productId);
+                if (index !== -1) {
+                    cartData[index].quantity = item.quantity;
+                    cartData[index].price = item.price;
+
+                    localStorage.setItem('cartData', JSON.stringify(cartData));
+                    setIsLoadding(false);
+                }
+            }
+        
+    }
+
+    const Remove = (decodedToken, productId) => {
+            if (decodedToken !== null && decodedToken !== "null") {
+                axios.delete(APIGATEWAY.CART.GETBYUSERNAME + decodedToken.username + '/' + productId).then(respone => {
+                    if (respone.status === 200) {
+                        window.alert("Xóa thành công");
+                    }
+                    else {
+                        window.alert("Vui lòng thử lại sau");
+                    }
+                }).catch(error => { window.alert("Đã xảy ra lỗi ", error) }).finally(e => {
+                    setIsLoadding(false);
                 })
-                .catch(error => console.error('Error adding to cart:', error));
-        }
-        else {
-            const index = cartData.findIndex(dataItem => dataItem.productId === item.productId);
-            if (index !== -1) {
-                cartData[index].quantity = item.quantity;
-                cartData[index].price = item.price;
+            }
+            else if (cartData !== null) {
+                cartData = cartData.filter(item => item.productId !== productId);
 
                 localStorage.setItem('cartData', JSON.stringify(cartData));
+                window.alert("Xóa thành công");
+                setIsLoadding(false);
+                window.location.reload();
+            } else {
+                setIsLoadding(false);
+                return <NotFound404 />;
             }
-        }
+       
+
     }
+    useEffect(() => {
+        console.log("isLoadding đã thay đổi:", isLoadding);
+    }, [isLoadding])
 
-    const Remove = (decodedToken,productId) => {
-
-        if (decodedToken!== null && decodedToken !== "null") {
-            axios.delete(APIGATEWAY.CART.GETBYUSERNAME + decodedToken.username + '/' + productId).then(respone => {
-                console.log(APIGATEWAY.CART.GETBYUSERNAME + decodedToken.username + '/' + productId)
-                if (respone.status === 200) {
-                    window.alert("Xóa thành công");
-
-                }
-                else {
-                    window.alert("Vui lòng thử lại sau");
-                }
-            }).catch(error => { window.alert("Đã xảy ra lỗi ", error) })
-        }
-        else if (cartData !== null) {
-            cartData = cartData.filter(item => item.productId !== productId);
-
-            localStorage.setItem('cartData', JSON.stringify(cartData));
-            window.alert("Xóa thành công");
-            window.location.reload();
-        } else {
-            return <NotFound404 />;
-        }
-    }
-
-
-
-    console.log(listCart);
     if (listCart === null || listCart.length === 0) {
         return <NotFound404 />
     }
@@ -207,7 +221,6 @@ const CartUser = () => {
             };
 
             setOrder(newOrder);
-            console.log("info order ", order);
             handleOrderSubmission(newOrder, sdt);
         } else {
             window.alert("Đặt hàng thành công");
@@ -217,115 +230,118 @@ const CartUser = () => {
     };
 
     const handleOrderSubmission = (order, sdt) => {
-        console.log("info order ", order);
-        axios.post(APIGATEWAY.ORDER.CREATE, order).then(response => {
-            if (response.status === 200) {
-                axios.delete(`${APIGATEWAY.CART.GETBYUSERNAME}${sdt}`).then(response => {
-                    if (response.status === 200) {
-                        window.alert("Đặt hàng thành công");
-                        window.location.reload();
-                    } else {
-                        window.location.reload();
-                    }
-                }).catch(error => {
-                    console.error("Lỗi:", error);
-                });
-            }
-        }).catch(error => {
-            console.error("Lỗi:", error);
-        });
+
+            axios.post(APIGATEWAY.ORDER.CREATE, order).then(response => {
+                if (response.status === 200) {
+                    axios.delete(`${APIGATEWAY.CART.GETBYUSERNAME}${sdt}`).then(response => {
+                        if (response.status === 200) {
+                            window.alert("Đặt hàng thành công");
+                            window.location.reload();
+                        } else {
+                            window.location.reload();
+                        }
+                    }).catch(error => {
+                        console.error("Lỗi:", error);
+                    }).finally(e => {
+                        setIsLoadding(false);
+                    });
+                }
+            }).catch(error => {
+                console.error("Lỗi:", error);
+            });
     };
     const handleClick = (event) => {
         event.preventDefault();
         const diachi = document.getElementById("diachi").value;
         const sdt = document.getElementById("sdt").value;
         thanhToan(diachi, sdt);
-        //window.location.reload();
     }
     return (
         <div className="cartpage">
 
-            <div className="container">
-                <div className="content">
-                    <div className="row">
-                        <div className="cartpage col-12">
-                            <div className="top">
-                                {
-                                    listCart.map((item) => (
-                                        <div className="item" key={item.productId}>
-                                            <img src={item.img} alt={item.name} />
-                                            <span>{item.name}</span>
-                                            <span>{Formater(parseFloat(item.price / item.quantity))} / 1 đvt</span>
-                                            <div className="btn">
-                                                <button className="btn-sub" onClick={() => Sub(item)}>-</button>
-                                                <input id={`lbl-num${item.productId}`} defaultValue={item.quantity} readOnly />
-                                                <button className="btn-add" onClick={() => Add(item)}>+</button>
+            {isLoadding ? <LoadingSpinner /> : <>
+                <div className="container">
+                    <div className="content">
+                        <div className="row">
+                            <div className="cartpage col-12">
+                                <div className="top">
+                                    {
+                                        listCart.map((item) => (
+                                            <div className="item" key={item.productId}>
+                                                <img src={item.img} alt={item.name} />
+                                                <span>{item.name}</span>
+                                                <span>{Formater(parseFloat(item.price / item.quantity))} / 1 đvt</span>
+                                                <div className="btn">
+                                                    <button className="btn-sub" onClick={(event) => { event.preventDefault(); Sub(item); } }>-</button>
+                                                    <input id={`lbl-num${item.productId}`} defaultValue={item.quantity} readOnly />
+                                                    <button className="btn-add" onClick={(event) => { event.preventDefault();  Add(item) }}>+</button>
+                                                </div>
+                                                <span id={`totalPrice${item.productId}`}>{Formater(item.price)}</span>
+
+                                                <button className="btn-remove" onClick={(event) => { event.preventDefault(); Remove(decodedToken, item.productId); window.location.reload(); }}>Xóa</button>
                                             </div>
-                                            <span id={`totalPrice${item.productId}`}>{Formater(item.price)}</span>
+                                        ))
+                                    }
+                                </div>
+                                <div className="bottom">
+                                    {caculatorTotalPrice()}
+                                    <span className="lblTotalPrice">Tổng tiền : {Formater(totalPrice)}</span>
 
-                                            <button className="btn-remove" onClick={() => { Remove(decodedToken, item.productId); window.location.reload(); }}>Xóa</button>
-                                        </div>
-                                    ))
-                                }
+                                    <div className="btn">
+                                        <button onClick={() => window.location.href = ROUTER.USER.PRODUCT}>Tiếp tục mua sắm</button>
+                                        <button onClick={(event) => {
+                                            event.preventDefault();
+                                            showFormPay();
+                                        }
+                                        }>Thanh toán</button>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="bottom">
-                                {caculatorTotalPrice()}
-                                <span className="lblTotalPrice">Tổng tiền : {Formater(totalPrice)}</span>
 
-                                <div className="btn">
-                                    <button onClick={() => window.location.href = ROUTER.USER.PRODUCT}>Tiếp tục mua sắm</button>
+                        </div>
+                        <div id="overlay"></div>
+                        <div className="form-order" id="form-order">
+                            <form>
+                                <div className="cancel">
                                     <button onClick={(event) => {
                                         event.preventDefault();
-                                        showFormPay();
-                                    }
-                                    }>Thanh toán</button>
+                                        const formorder = document.getElementById("form-order");
+                                        const overlay = document.getElementById("overlay");
+                                        overlay.style.display = "none";
+                                        formorder.style.display = "none";
+                                    }}>x</button>
                                 </div>
-                            </div>
+                                <h1>Thanh toán đơn hàng</h1>
+                                <h2>Thông tin thanh toán</h2>
+                                <div className="hoten">
+                                    <div>
+                                        <label for="ten">Tên *</label>
+                                        <input type="text" id="ten" placeholder="Nhập tên" />
+                                    </div>
+                                    <div>
+                                        <label for="ho">Họ *</label>
+                                        <input type="text" id="ho" placeholder="Nhập họ" />
+                                    </div>
+                                </div>
+
+                                <label for="diachi">Địa chỉ *</label>
+                                <input type="text" id="diachi" placeholder="Nhập địa chỉ" />
+                                <label for="diachi">Số điên thoại *</label>
+                                <input type="tel" id="sdt" placeholder="Nhập số điên thoại" defaultValue={decodedToken !== null ? decodedToken.username : ""} />
+                                <select id="paymentMethod" value={paymentMethod} onChange={(event) => handlePaymentMethod(event)}>
+                                    <option value="">Chọn phương thức thanh toán</option>
+                                    <option value="Chuyển khoản">Chuyển khoản</option>
+                                    <option value="Thanh toán khi nhận hàng">Thanh toán khi nhận hàng</option>
+                                </select>
+
+                                <span className="lblTotalPrice">Tổng tiền : {Formater(totalPrice)}</span>
+                                <button className="btn" onClick={(event) => { setIsLoadding(true);  handleClick(event); }}>Đặt hàng ngay</button>
+
+                            </form>
                         </div>
-
-                    </div>
-                    <div id="overlay"></div>
-                    <div className="form-order" id="form-order">
-                        <form>
-                            <div className="cancel">
-                                <button onClick={(event) => {
-                                    event.preventDefault();
-                                    const formorder = document.getElementById("form-order");
-                                    const overlay = document.getElementById("overlay");
-                                    overlay.style.display = "none";
-                                    formorder.style.display = "none";
-                                }}>x</button>
-                            </div>
-                            <h1>Thanh toán đơn hàng</h1>
-                            <h2>Thông tin thanh toán</h2>
-                            <div className="hoten">
-                                <div>
-                                    <label for="ten">Tên *</label>
-                                    <input type="text" id="ten" placeholder="Nhập tên" />
-                                </div>
-                                <div>
-                                    <label for="ho">Họ *</label>
-                                    <input type="text" id="ho" placeholder="Nhập họ" />
-                                </div>
-                            </div>
-
-                            <label for="diachi">Địa chỉ *</label>
-                            <input type="text" id="diachi" placeholder="Nhập địa chỉ" />
-                            <label for="diachi">Số điên thoại *</label>
-                            <input type="tel" id="sdt" placeholder="Nhập số điên thoại" defaultValue={decodedToken!==null? decodedToken.username:""} />
-                            <select id="paymentMethod" value={paymentMethod} onChange={(event) => handlePaymentMethod(event)}>
-                                <option value="">Chọn phương thức thanh toán</option>
-                                <option value="Chuyển khoản">Chuyển khoản</option>
-                                <option value="Thanh toán khi nhận hàng">Thanh toán khi nhận hàng</option>
-                            </select>
-
-                            <span className="lblTotalPrice">Tổng tiền : {Formater(totalPrice)}</span>
-                            <button className="btn" onClick={handleClick }>Đặt hàng ngay</button>
-                            
-                        </form>
                     </div>
                 </div>
-            </div>
+            </>}
         </div>
 
     )

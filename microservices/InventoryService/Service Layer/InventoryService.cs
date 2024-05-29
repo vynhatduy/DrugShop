@@ -7,24 +7,38 @@ namespace InventoryServices.Service_Layer
     {
         private readonly IInventoryRepository _inventoryRepository;
 
+
         public InventoryService(IInventoryRepository inventoryRepository)
         {
             _inventoryRepository = inventoryRepository;
         }
-
+        public async Task<List<Inventory>> GetAll()
+        {
+            return await _inventoryRepository.GetAll();
+        }
         public async Task<int> GetProductStockAsync(int productId)
         {
             return await _inventoryRepository.GetProductStockAsync(productId);
         }
 
-        public async Task UpdateProductStockAsync(int productId, int quantity,int sales)
+        public async Task<bool> UpdateProductStockAsync(Inventory item)
         {
-            await _inventoryRepository.UpdateProductStockAsync(productId, quantity,sales);
+            var respone= await _inventoryRepository.UpdateProductStockAsync(item);
+            if (respone)
+            {
+                return true;
+            }
+            return false;
         }
 
-        public async Task AddNewInventoryItemAsync(Inventory item)
+        public async Task<bool> AddNewInventoryItemAsync(Inventory item)
         {
-            await _inventoryRepository.AddNewInventoryItemAsync(item);
+           var respone= await _inventoryRepository.AddNewInventoryItemAsync(item);
+            if (respone)
+            {
+                return true;
+            }
+            return false;
         }
 
         public async Task<bool> DeleteInventoryItemAsync(int productId)
